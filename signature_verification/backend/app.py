@@ -351,8 +351,23 @@ def verify_pair_signature():
             min_dist = dist
             closest_ref = ref["path"]
 
+    # Fix macOS path to Windows path
+    closest_ref = closest_ref.replace(
+    "/Users/christelle/Desktop/SNNDEFENSE",
+    "C:/Users/Marie/SNN/SNNDEFENSE-1"
+    )
+    
     # ✅ Save closest reference image
     ref_img = cv2.imread(closest_ref, cv2.IMREAD_GRAYSCALE)
+   
+    if ref_img is None:
+      print(f"[ERROR] Failed to load image: {closest_ref}")
+      return jsonify({"error": "Reference image not found or unreadable."}), 400
+    
+    if ref_img.dtype != 'uint8':
+      print("[WARNING] Converting image to uint8")
+    ref_img = ref_img.astype('uint8')
+
     ref_preview_name = f"pair_reference_{os.path.basename(closest_ref)}"
     cv2.imwrite(os.path.join(STATIC_TEMP, ref_preview_name), ref_img)
 

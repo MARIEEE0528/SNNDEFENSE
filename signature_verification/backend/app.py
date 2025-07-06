@@ -277,8 +277,29 @@ def get_triplet_example():
                     min_neg_dist = dist
                     neg_path = ref["path"]
 
+        # Fix macOS path to Windows path
+        def fix_path(path):
+           return path.replace(
+        "/Users/christelle/Desktop/SNNDEFENSE",
+        "C:/Users/Marie/SNN/SNNDEFENSE-1"
+        )            
+
         def save_preview_image(src, dest_name):
+            src = fix_path(src)
+            if not os.path.exists(src):
+               print(f"[ERROR] Image path does not exist: {src}")
+               return None  # or raise an exception or return a fallback image path
+            
             img = cv2.imread(src, cv2.IMREAD_GRAYSCALE)
+
+            if img is None:
+               print(f"[ERROR] Failed to load image: {src}")
+               return None
+
+            if img.dtype != 'uint8':
+               print("[WARNING] Converting image to uint8")
+               img = img.astype('uint8')
+
             dest = os.path.join(STATIC_TEMP, dest_name)
             cv2.imwrite(dest, img)
             return f"/static/temp/{dest_name}"
@@ -386,3 +407,4 @@ def serve_temp(filename):
 
 if __name__ == "__main__":
     app.run(debug=True)
+    
